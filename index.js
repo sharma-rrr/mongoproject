@@ -1,6 +1,7 @@
 require('dotenv').config();
 console.log('MONGO_URL:', process.env.MONGO_URL);
 
+
 // Initialize DB Connection
 require('./config/database');
 

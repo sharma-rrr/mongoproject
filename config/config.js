@@ -1,6 +1,5 @@
 'use strict';
 const path = require( 'path' );
-
 module.exports.getConfig = () => {
     const config = {
         'MODE': 'Development',

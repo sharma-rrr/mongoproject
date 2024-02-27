@@ -1,5 +1,5 @@
 {
-  "name": "node-mongoose-setup",
+  "name": "mongoose-setup",
   "version": "1.0.0",
   "description": "Node Mongoose Setup",
   "main": "index.js",
@@ -10,14 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:sunilksamanta/node-mongoose-setup.git"
+    "url": "git+ssh://git@github.com/sunilksamanta/node-mongoose-setup.git"
   },
   "author": "Sunil Kumar Samanta",
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.2",
     "auto-bind": "^4.0.0",
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
@@ -40,5 +41,13 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.12.1",
     "eslint-plugin-import": "^2.22.1"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/sunilksamanta/node-mongoose-setup/issues"
+  },
+  "homepage": "https://github.com/sunilksamanta/node-mongoose-setup#readme",
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": []
 }

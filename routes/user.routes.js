@@ -11,5 +11,11 @@ router.post('/addUser', controllerInstance.addUser);
 // login api
 router.post('/login',controllerInstance.login)
 
+// update data
+router.post('/update',controllerInstance.update)
+
+// add data from parents table
+router.post('/adddata',controllerInstance.adddetails)
 
 module.exports = router;
+ 
