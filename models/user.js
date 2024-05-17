@@ -1,29 +1,39 @@
-// models/user.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
 const userSchema = new Schema({
-  email: {
+  uniqueId: {
     type: String,
-    required: true,
-    unique: true,
-    trim: true,
+    trim: false
   },
-  password: {
+  money: {
+    type: Number,
+    trim: false
+  },
+  shield: {
+    type: Number, // Assuming it's a shield, corrected from 'shilied'
+    trim: false
+  },
+  levels: {
+    type: Number,
+    trim: false
+  },
+  isPurchase: {
+    type: Boolean,
+    default: false, // Assuming it's a boolean flag, defaulting to false
+    trim: false
+  },
+  buster: {
+    type: Number,
+    trim: false
+  },
+  name: {
     type: String,
-    required: true,
-    trim: true,
+    trim: false
   },
-  fname: {
+  dailyReward: {
     type: String,
-    required: true,
-    trim: true,
-  },
-  lname: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+    trim: false
+  }
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
