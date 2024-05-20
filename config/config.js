@@ -8,11 +8,9 @@ module.exports.getConfig = () => {
         'UPLOAD_PATH': path.resolve( `${__dirname }/../uploads` ),
         'JWT_SECRET': process.env.JWT_SECRET || 'R4ND0M5TR1NG'
     };
-
     // Modify for Production
     if ( process.env.NODE_ENV === 'production' ) {
         config.MODE = 'Production';
     }
-
     return config;
 };

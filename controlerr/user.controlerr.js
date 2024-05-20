@@ -8,6 +8,8 @@ const commonControler = require('../controlerr/common.controler');
 const request = require('request');
 const { has } = require('config');
 const { use } = require('chai');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;;
 
 
 class UserController {
@@ -284,8 +286,152 @@ async addOutfit(req, res) {
     commonControler.errorMessage("An error occurred", res);
   }
 }
+  
+// uniqueid convert into email
+async changemail(req, res) {
+  const { uniqueId, email } = req.body;
+  try {
+    // Find the user by the uniqueId
+    const user = await User.findOne({ uniqueId });
+    if (!user) {
+      // User not found, send an error message
+      commonControler.errorMessage("User not found", res);
+    } else {
+      // Update the uniqueId to email
+      user.uniqueId = email;
+      // Save the updated user object
+      await user.save();
+      // Send a success message
+      commonControler.successMessage(user, "Data updated successfully", res);
+    }
+  } catch (err) {
+    // Handle any errors that occur
+    commonControler.errorMessage("An error occurred", res);
+  }
+}
 
 
+async  getDataWithObjId(req, res) {
+  const { objectId } = req.body;
+  if (!ObjectId.isValid(objectId)) {
+    return commonControler.errorMessage("Invalid ObjectId format", res);
+  }
+  try {
+    const user = await User.findById(objectId);
+    console.log("user", user);
+   commonControler.successMessage(user, "get data", res);
+  } catch (err) {
+    console.error("Error occurred:", err); 
+    commonControler.errorMessage("An error occurred", res);
+  }
+}
+
+
+
+async  deleteUser(req, res) {
+  const { objectId } = req.body;
+  try {
+    if (!ObjectId.isValid(objectId)) {
+      return commonControler.errorMessage("Invalid ObjectId format", res);
+    }
+    const user = await User.findByIdAndDelete(objectId);
+    console.log(typeof user);
+  if(user){
+    commonControler.successMessage(null,"user delte succefully",res )
+  }else{
+    commonControler.errorMessage("user not found",res)
+  }
+  } catch (err) {
+    console.error("Error occurred:", err); 
+    commonControler.errorMessage("An error occurred", res); 
+}
 
 }
+
+// get all data
+async getdata(req,res){
+  try{
+   const user = await User.find()
+    commonControler.successMessage(user,"get data",res)
+  }catch(err){
+    commonControler.errorMessage("occured error",res)
+  }
+}
+
+
+// left join 
+  async  leftjoin(req, res) {
+    const { uniqueId } = req.body;
+    try {
+      const usersWithBikes = await User.aggregate([
+        {
+          $match: { uniqueId } // Match the specific user by uniqueId
+        },
+        {
+          $lookup: {
+            from: 'userbikes',
+            localField: 'uniqueId',
+            foreignField: 'userId',
+            as: 'userBikes'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            uniqueId: 1,
+            userBikes: {
+              userId: 1,  
+              selectOutfit: 1,
+              availbleOutfit: 1,
+              
+            }
+          }
+        }
+      ]);
+
+      if (usersWithBikes.length > 0) {
+        res.status(200).json({ message: 'Data retrieved successfully', data: usersWithBikes[0] });
+      } else {
+        commonControler.errorMessage("user not found",res)
+      }
+    } catch (error) {
+      commonControler.errorMessage("occured error",res)
+    }
+  }
+
+
+  // async leftjoin(req, res) {
+  //   const { uniqueId } = req.body;
+  //   try {
+  //     const usersWithBikes = await User.aggregate([
+  //       {
+  //         $match: { uniqueId } // Match the specific user by uniqueId and include only necessary fields
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'userbikes',
+  //           localField: 'uniqueId',
+  //           foreignField: 'userId',
+  //           as: 'userBikes'
+  //         }
+  //       }
+  //     ]);
+  
+  //     if (usersWithBikes.length > 0) {
+  //       // Sending only the first document if found
+  //       res.status(200).json({ message: 'Data retrieved successfully', data: usersWithBikes[0] });
+  //     } else {
+  //       // Sending error message if user not found
+  //       commonControler.errorMessage("User not found", res);
+  //     }
+  //   } catch (error) {
+  //     // Sending error message if an error occurred during aggregation
+  //     commonControler.errorMessage("An error occurred", res);
+  //   }
+  // }
+  
+
+}
+
+
 module.exports = UserController;
