@@ -19,6 +19,7 @@ class UserController {
  async addUser(req, res) {
   const { email, lname, fname, password } = req.body;
   try {
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -118,6 +119,8 @@ async  adddetails(req, res) {
   
 }
 
+
+
 async  loginapi(req, res) {
   const { email, password } = req.body;
   console.log("request", req.body);
@@ -179,7 +182,6 @@ try{
    uniqueId
     
   })
-
   if(user){
    user.levels=levels
    await user.save(); 
@@ -213,7 +215,7 @@ async updateBuster(req, res) {
   }
 }
 
-
+// update shield
 async updateshiled(req,res){
   const{uniqueId,shield}=req.body;
   try{
@@ -345,7 +347,6 @@ async  deleteUser(req, res) {
     console.error("Error occurred:", err); 
     commonControler.errorMessage("An error occurred", res); 
 }
-
 }
 
 // get all data
@@ -360,7 +361,7 @@ async getdata(req,res){
 
 
 // left join 
-  async  leftjoin(req, res) {
+  async  lookupjoin(req, res) {
     const { uniqueId } = req.body;
     try {
       const usersWithBikes = await User.aggregate([
@@ -375,18 +376,18 @@ async getdata(req,res){
             as: 'userBikes'
           }
         },
-        {
-          $project: {
-            _id: 1,
-            uniqueId: 1,
-            userBikes: {
-              userId: 1,  
-              selectOutfit: 1,
-              availbleOutfit: 1,
+        // {
+        //   $project: {
+        //     _id: 1,
+        //     uniqueId: 1,
+        //     userBikes: {
+        //       userId: 1,  
+        //       selectOutfit: 1,
+        //       availbleOutfit: 1,
               
-            }
-          }
-        }
+        //     }
+        //   }
+        // }
       ]);
 
       if (usersWithBikes.length > 0) {
@@ -400,36 +401,7 @@ async getdata(req,res){
   }
 
 
-  // async leftjoin(req, res) {
-  //   const { uniqueId } = req.body;
-  //   try {
-  //     const usersWithBikes = await User.aggregate([
-  //       {
-  //         $match: { uniqueId } // Match the specific user by uniqueId and include only necessary fields
-  //       },
-  //       {
-  //         $lookup: {
-  //           from: 'userbikes',
-  //           localField: 'uniqueId',
-  //           foreignField: 'userId',
-  //           as: 'userBikes'
-  //         }
-  //       }
-  //     ]);
-  
-  //     if (usersWithBikes.length > 0) {
-  //       // Sending only the first document if found
-  //       res.status(200).json({ message: 'Data retrieved successfully', data: usersWithBikes[0] });
-  //     } else {
-  //       // Sending error message if user not found
-  //       commonControler.errorMessage("User not found", res);
-  //     }
-  //   } catch (error) {
-  //     // Sending error message if an error occurred during aggregation
-  //     commonControler.errorMessage("An error occurred", res);
-  //   }
-  // }
-  
+
 
 }
 

@@ -24,8 +24,8 @@ router.post('/deleteuser', controllerInstance.deleteUser);
 // get all data
 router.post('/data', controllerInstance.getdata);
 
-// get data  from bothtables
-router.post('/left', controllerInstance.leftjoin);
+// lookup join as leftjoin
+router.post('/lookup', controllerInstance.lookupjoin);
 
 // syntax of lookup
 // db.orders.aggregate( [
