@@ -7,16 +7,21 @@ const router = express.Router();
 const controllerInstance = new usercontroller();
 
 // Set up the route to add a user
+// user reg
 router.post('/userReg', controllerInstance.userReg);
+// update level
 router.post('/updatelevel', controllerInstance.updatelevels);
+// update user buster
 router.post('/updatebuster', controllerInstance.updateBuster);
+// update shild
 router.post('/updateshild', controllerInstance.updateshiled);
+// adddaily reward
 router.post('/addrewrd', controllerInstance.addDailyReward);
 // add userbike outfit
-router.post('/userOutFit', controllerInstance.addOutfit);
+router.post('/adduserOutFit', controllerInstance.addOutfit);
 // unique id convert into email
 router.post('/change', controllerInstance.changemail);
-// get data with objectid
+// get data by objectid
 router.post('/getdata', controllerInstance.getDataWithObjId);
 // delete users
 router.post('/deleteuser', controllerInstance.deleteUser);
@@ -27,18 +32,15 @@ router.post('/data', controllerInstance.getdata);
 // lookup join as leftjoin
 router.post('/lookup', controllerInstance.lookupjoin);
 
-// syntax of lookup
-// db.orders.aggregate( [
-//     {
-//       $lookup:
-//         {
-//           from: "inventory",
-//           localField: "item",
-//           foreignField: "sku",
-//           as: "inventory_docs"
-//         }
-//    }
-//  ] )
+
+// get data from users tables
+router.post('/aa',controllerInstance.getusers);
+
+// delete  fetch data from users table and userbike table 
+router.post('/deldata',controllerInstance.deldata);
+
+
+
 
 
 

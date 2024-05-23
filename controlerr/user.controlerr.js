@@ -147,11 +147,11 @@ async  loginapi(req, res) {
 
 
 async  userReg(req, res) {
-  const{uniqueId,money,buster,name,dailyReward,levels,shield}=req.body;
+  const{_id,money,buster,name,dailyReward,levels,shield}=req.body;
   console.log(req.body,"yes here")
   try{
     const sun=await User.findOne({
-      uniqueId
+      _id
     })
     console.log(sun,"sundata here");
     if(sun){
@@ -169,6 +169,7 @@ async  userReg(req, res) {
   }catch(e){
     console.log(e);
     commonControler.errorMessage(`${e}`,res)
+    
   }
 
 }
@@ -254,40 +255,42 @@ async addDailyReward(req, res) {
 
 //  add user bike outfit
 async addOutfit(req, res) {
-  const {uniqueId, selectOutfit, availbleOutfit } = req.body;
-  console.log(req.body, "rrrr");
-  try {
-    const user = await User.findOne({ uniqueId });
-    console.log(user, "userdata");
-    if (!user) {
-      return commonControler.errorMessage("User not found", res);
-    }
+  const {_id, selectOutfit, availbleOutfit } = req.body;
 
-    const outfit = await Userbike.findOne({
-       userId: user.uniqueId 
-      });
-    console.log("outfit", outfit);
-    if (outfit) {
-      // Update the existing outfit
-      outfit.selectOutfit = selectOutfit;
-      outfit.availbleOutfit = availbleOutfit;
-      outfit.userId = user.uniqueId; 
-      await outfit.save();
-      commonControler.successMessage(outfit,"data updated sucessfully",res)
-    } else {
-      // Create a new outfit
-      const userbike =await Userbike.create({
-        userId: user.uniqueId,
-        selectOutfit,
-        availbleOutfit
-      });
-     commonControler.successMessage(userbike, "Outfit added successfully",res)
-    }
+  try {
+      // Find the user by id
+      const user = await User.findOne({ _id });
+
+      if (!user) {
+          return commonControler.errorMessage("User not found", res);
+      }
+
+      // Find the user's bike by userId
+      let userbike = await Userbike.findOne({ userId: user._id });
+
+      if (userbike) {
+          // Update the existing outfit
+          userbike.selectOutfit = selectOutfit;
+          userbike.availbleOutfit = availbleOutfit;
+          await userbike.save();
+
+          return commonControler.successMessage(userbike, "Outfit updated successfully", res);
+      } else {
+          // Create a new outfit
+          userbike = await Userbike.create({
+              userId: user._id,
+              selectOutfit,
+              availbleOutfit
+          });
+
+          return commonControler.successMessage(userbike, "Outfit added successfully", res);
+      }
   } catch (err) {
-    console.log('err', err);
-    commonControler.errorMessage("An error occurred", res);
+      console.log('Error:', err);
+      return commonControler.errorMessage("An error occurred", res);
   }
 }
+
   
 // uniqueid convert into email
 async changemail(req, res) {
@@ -321,6 +324,9 @@ async  getDataWithObjId(req, res) {
   try {
     const user = await User.findById(objectId);
     console.log("user", user);
+    if(!user){
+      commonControler.errorMessage("user not found",res)
+    }
    commonControler.successMessage(user, "get data", res);
   } catch (err) {
     console.error("Error occurred:", err); 
@@ -331,12 +337,12 @@ async  getDataWithObjId(req, res) {
 
 
 async  deleteUser(req, res) {
-  const { objectId } = req.body;
+  const { _id } = req.body;
   try {
     if (!ObjectId.isValid(objectId)) {
       return commonControler.errorMessage("Invalid ObjectId format", res);
     }
-    const user = await User.findByIdAndDelete(objectId);
+    const user = await User.findByIdAndDelete(_id);
     console.log(typeof user);
   if(user){
     commonControler.successMessage(null,"user delte succefully",res )
@@ -349,7 +355,7 @@ async  deleteUser(req, res) {
 }
 }
 
-// get all data
+// get all data from user
 async getdata(req,res){
   try{
    const user = await User.find()
@@ -400,10 +406,50 @@ async getdata(req,res){
     }
   }
 
-
-
-
+  // get all users
+ // get all users
+async getusers(req, res) {
+  try {
+      const users = await User.find({});
+      commonControler.successMessage(users, "get data", res);
+  } catch (err) {
+      console.log(err, "Err");
+      commonControler.errorMessage("occurred error", res);
+  }
 }
+
+// delete  fetch data from users table and userbike table 
+async deldata(req, res) {
+  const { _id } = req.body;
+  try {
+      // Find the user by id
+      const user = await User.findById(_id);
+      if (!user) {
+          return commonControler.errorMessage("User not found", res);s
+      }
+
+      // Find the user's bike by userId
+      const userbike = await Userbike.findOne({ userId: user._id });
+      if (user && userbike) {
+          // Delete the user's bike
+          await Userbike.findByIdAndDelete(userbike._id);
+          // Delete the user
+          await User.findByIdAndDelete(user._id);
+          return commonControler.successMessage({}, "user and userbikes table data delete successfully", res);
+      } else {
+        commonControler.errorMessage("user bike data not found",res)
+      }
+  } catch (err) {
+      console.log("Error:", err);
+      return commonControler.errorMessage("Occurred error", res);
+  }
+}
+
+  }
+
+
+
+
 
 
 module.exports = UserController;
