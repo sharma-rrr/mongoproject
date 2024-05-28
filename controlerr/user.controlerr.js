@@ -603,7 +603,6 @@ async updatearrnum(req, res) {
        for (let i = 0; i < type.length; i++) {
         console.log(type[i],"dd");
        }
-
        type.push(name)
        console.log(type,"sss");
         user.name =JSON.stringify(type)

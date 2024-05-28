@@ -66,8 +66,9 @@ router.post('/arrofobj',controllerInstance.addarrofobj);
 // update arr of object
 router.post('/updatearrobj',controllerInstance.updatearrobj);
 
-// 
+// array of object in push data
 router.post('/pushdataaa',controllerInstance.pushdataarrofobj);
+
 
 
 
