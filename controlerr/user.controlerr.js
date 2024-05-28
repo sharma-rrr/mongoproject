@@ -3,6 +3,7 @@ const common = require('mocha/lib/interfaces/common');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require ('../models/user.js')
+const parent =require ('../models/parents.js')
 const Userbike =require ('../models/outfit.js')
 const commonControler = require('../controlerr/common.controler');
 const request = require('request');
@@ -66,7 +67,7 @@ class UserController {
   }
   
 
-
+// update  data
 async update(req,res){
 const{email,lname,fname}=req.body;
 console.log(req.body,"dghjhdjsk")
@@ -366,45 +367,105 @@ async getdata(req,res){
 }
 
 
-// left join 
-  async  lookupjoin(req, res) {
-    const { uniqueId } = req.body;
-    try {
-      const usersWithBikes = await User.aggregate([
-        {
-          $match: { uniqueId } // Match the specific user by uniqueId
-        },
-        {
-          $lookup: {
-            from: 'userbikes',
-            localField: 'uniqueId',
-            foreignField: 'userId',
-            as: 'userBikes'
-          }
-        },
-        // {
-        //   $project: {
-        //     _id: 1,
-        //     uniqueId: 1,
-        //     userBikes: {
-        //       userId: 1,  
-        //       selectOutfit: 1,
-        //       availbleOutfit: 1,
-              
-        //     }
-        //   }
-        // }
-      ]);
+// lookup join
+async  lookupjoin(req, res) {
+  const { uniqueId } = req.body;
 
-      if (usersWithBikes.length > 0) {
-        res.status(200).json({ message: 'Data retrieved successfully', data: usersWithBikes[0] });
-      } else {
-        commonControler.errorMessage("user not found",res)
+  try {
+    const usersWithBikes = await User.aggregate([
+      {
+        $match: { uniqueId } // Match the specific user by uniqueId
+      },
+      {
+        $lookup: {
+          from: 'userbikes',
+          localField: 'uniqueId',
+          foreignField: 'userId',
+          as: 'userBikes'
+        }
+      },
+      {
+        $lookup: {
+          from: 'parents',
+          localField: 'uniqueId',
+          foreignField: 'userId',
+          as: 'parents'
+        }
       }
-    } catch (error) {
-      commonControler.errorMessage("occured error",res)
+    ]);
+
+    if (usersWithBikes.length > 0) {
+      res.status(200).json({ message: 'Data retrieved successfully', data: usersWithBikes[0] });
+    } else {
+      commonControler.errorMessage("User not found", res);
     }
+  } catch (error) {
+    console.error("Error occurred:", error);
+    commonControler.errorMessage("An error occurred while retrieving data", res);
   }
+}
+
+
+// async  lookupjoin(req, res) {
+//   const { _id } = req.body;
+
+//   try {
+//     // Ensure the _id is in ObjectId format if it is not already
+//     const ObjectId = require('mongoose').Types.ObjectId;
+//     if (!ObjectId.isValid(_id)) {
+//       return commonControler.errorMessage("Invalid user ID format", res);
+//     }
+
+//     const usersWithBikes = await User.aggregate([
+//       {
+//         $match: { _id: ObjectId(_id) } // Match the specific user by _id
+//       },
+//       {
+//         $lookup: {
+//           from: 'userbikes',
+//           localField: '_id',
+//           foreignField: 'userId',
+//           as: 'userbikes'
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: 'parents',
+//           localField: '_id',
+//           foreignField: 'userId',
+//           as: 'parents'
+//         }
+//       }
+//     ]);
+
+//     if (usersWithBikes.length > 0) {
+//       // Parse the name field
+//       const user = usersWithBikes[0];
+//       if (user.name && user.name.length > 0) {
+//         try {
+//           user.name = user.name.map(nameStr => JSON.parse(nameStr));
+//         } catch (e) {
+//           console.error("Error parsing name field:", e);
+//           return commonControler.errorMessage("Error parsing user data", res);
+//         }
+//       }
+
+//       res.status(200).json({ message: 'Data retrieved successfully', data: user });
+//     } else {
+//       commonControler.errorMessage("User not found", res);
+//     }
+//   } catch (error) {
+//     console.error("Error occurred:", error);
+//     commonControler.errorMessage("An error occurred while retrieving data", res);
+//   }
+// }
+
+
+
+
+
+
+
 
   // get all users
  // get all users
@@ -412,7 +473,7 @@ async getusers(req, res) {
   try {
       const users = await User.find({});
       commonControler.successMessage(users, "get data", res);
-  } catch (err) {
+  }catch (err) {
       console.log(err, "Err");
       commonControler.errorMessage("occurred error", res);
   }
@@ -695,6 +756,39 @@ async updatearrnum(req, res) {
           console.log("err", err);
           return commonControler.errorMessage("occurred error", res);
         }
+      }
+         // add parentsdata
+         async addParentsData(req, res) {
+          const { _id, fName, mName, address } = req.body;
+          
+          try {
+              const user = await User.findById(_id);
+              
+              if (!user) {
+                  return commonController.errorMessage("User not found", res);
+              }
+              
+              let userParent = await parent.findOne({ userId: user._id });
+              
+              if (userParent) {
+                  userParent.fName = fName;
+                  userParent.mName = mName;
+                  userParent.address = address;
+                  await userParent.save();
+                  return commonControler.successMessage(userParent, "Updated data", res);
+              } else {
+                  const addParentData = await parent.create({
+                    fName,
+                    mName,
+                      address,
+                      userId: user._id
+                  });
+                  return commonControler.successMessage(addParentData, "Added parent data", res);
+              }
+          } catch (err) {
+              console.log(err, "error");
+              return commonControler.errorMessage("An error occurred", res);
+          }
       }
       
 

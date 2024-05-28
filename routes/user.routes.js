@@ -40,11 +40,12 @@ router.post('/aa',controllerInstance.getusers);
 // delete  fetch data from users table and userbike table 
 router.post('/deletedata',controllerInstance.deldata);
 
- 
+
 // array of string
 router.post('/arrstring',controllerInstance.arrstring);
 
 // update arrstring
+
 router.post('/updatestr',controllerInstance.updatestr);
 
 // update artray of string data
@@ -69,6 +70,8 @@ router.post('/updatearrobj',controllerInstance.updatearrobj);
 // array of object in push data
 router.post('/pushdataaa',controllerInstance.pushdataarrofobj);
 
+//add data parents
+router.post('/addparents',controllerInstance.addParentsData);
 
 
 
