@@ -27,8 +27,8 @@ const userSchema = new Schema({
     trim: false
   },
   name: {
-    type: String,
-    trim: false
+    type: [String],
+    required: true,
   },
   dailyReward: {
     type: String,

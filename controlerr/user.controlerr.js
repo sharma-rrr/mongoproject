@@ -9,7 +9,9 @@ const request = require('request');
 const { has } = require('config');
 const { use } = require('chai');
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Types;;
+const saveSubdocs = require('mongoose/lib/plugins/saveSubdocs.js');
+const { log } = require('async');
+const { ObjectId } = mongoose.Types;
 
 
 class UserController {
@@ -19,9 +21,7 @@ class UserController {
  async addUser(req, res) {
   const { email, lname, fname, password } = req.body;
   try {
-
     const userExists = await User.findOne({ email });
-
     if (userExists) {
       commonControler.errorMessage("Email already exists", res);
     } else {
@@ -32,7 +32,6 @@ class UserController {
         lname,
         password: hashedPassword,
       });
-
       commonControler.successMessage(newUser, "Data added successfully", res);
     }
   } catch (err) {
@@ -45,7 +44,6 @@ class UserController {
   // login
   async login(req, res) {
       const { email, password } = req.body;
-  
       try {
           const user = await User.findOne({ email });
   
@@ -175,7 +173,7 @@ async  userReg(req, res) {
 }
 
 
-
+// update levels
 async  updatelevels(req, res) {
 const {uniqueId,levels}=req.body;
 try{
@@ -355,6 +353,8 @@ async  deleteUser(req, res) {
 }
 }
 
+
+
 // get all data from user
 async getdata(req,res){
   try{
@@ -445,11 +445,259 @@ async deldata(req, res) {
   }
 }
 
+// array string
+async  arrstring(req, res) {
+  try {
+    const cars = ["Saab", "Volvo", "BMW"];
+    const users = await User.create({
+      name: cars
+    });
+    commonControler.successMessage(users, "add data", res);
+  } catch (err) {
+    console.log(err, "err");
+    commonControler.errorMessage('occurred err', res);
   }
+}
+
+// update string used with map fution
+async  updatestr(req, res) {
+  const { name, _id, link } = req.body;
+
+  try {
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return commonControler.errorMessage("User not found", res);
+    }
+
+    console.log('User found:', user);
+ // Check if the name matches "saab" (case-insensitive)
+    const updatedNames = user.name.map(name => name.toLowerCase() === "rr" ? "ss" : name);
+    // Update the user's name array
+    user.name = updatedNames;
+
+    await user.save();
+    console.log('User updated:', user);
+
+    return commonControler.successMessage(user, "User updated successfully", res);
+  } catch (err) {
+    console.error('Error occurred:', err);
+    return commonControler.errorMessage("An error occurred", res);
+  }
+}
+
+// update data
+async  updatearrayofstring(req, res) {
+  const { _id, name, link, newname } = req.body;
+  try {
+    const user = await User.findById(_id);
+    console.log(typeof user.name);
+
+    if (!user) {
+      return commonControler.errorMessage("User not found", res);
+    }
+ 
+    let arr = [];
+    console.log(user.name,"name");
+    for (let i = 0; i < user.name.length; i++) {
+      // console.log(user.name[i], "here name data");
+      if (user.name[i] === newname) {
+        console.log("Yes, name found:", newname);
+        arr.push(link);
+      }else{
+        arr.push(user.name[i])
+      }
+    }
+    console.log(arr,"arrrrrrr");
+     user.name = arr
+    await user.save()
+    commonControler.successMessage(user,"aaa",res)
+  } catch (err) {
+    console.error('Error occurred:', err); 
+    return commonControler.errorMessage("An error occurred", res);
+  }
+}
+
+// pushdata array string
+async pushdatastr(req, res) {
+  const { name, _id } = req.body;
+  console.log(req.body, "rrrttr");
+  try {
+      const user = await User.findById(_id);
+      console.log("Ddff", user);
+      if (!user) {
+          commonControler.errorMessage("user not found", res);
+      } else {
+          // Push the 'name' property from the request body into the 'user' array
+          user.name.push(name);
+          await user.save(); 
+          res.status(200).json(user); 
+      }
+  } catch (err) {
+      console.log("err", err);
+      commonControler.errorMessage("an error occurred", res);
+  }
+}
 
 
 
+//  add arr number
+async arrayofnumber(req,res){
+    try{
+      const arrnum =[1,2,3,4,5,6,7]
+      console.log(typeof arrnum,"hsghg");
+      const type =JSON.stringify(arrnum)
+      const user =await User.create({
+        name:type
+      })
+     commonControler.successMessage(user,"data add ",res)
+    }catch(err){
+      commonControler.errorMessage("occured err",res)
+    }
+}
+
+// updatearr num
+async updatearrnum(req, res) {
+    const { _id, newname, valueupdate } = req.body;
+    try {
+      const user = await User.findById(_id);
+      console.log(user, "userdata_______");
+      if (!user) {
+        return commonControler.errorMessage("user not found", res);
+      }
+
+      console.log(user.name, "Original user.name");
+  
+      let arr = JSON.parse(user.name);
+  
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === newname) {  
+          console.log("yes");
+          arr[i] = valueupdate;
+          console.log("updated value");
+        }
+      }
+      user.name = JSON.stringify(arr);
+      await user.save();
+      console.log("data", user);
+      commonControler.successMessage(user, "data updated", res);
+    } catch (err) {
+      console.error(err); 
+      commonControler.errorMessage("occurred error", res);
+    }
+  }
+  
+  // data add
+       async pushdata(req,res){
+        const {name,_id}=req.body;
+        try{
+          const  user =await User.findById({
+            _id
+          })
+          console.log(typeof user)
+          if(!user){
+            commonControler.errorMessage("user not found",res)
+          }
+
+       const type =JSON.parse(user.name)
+       for (let i = 0; i < type.length; i++) {
+        console.log(type[i],"dd");
+       }
+
+       type.push(name)
+       console.log(type,"sss");
+        user.name =JSON.stringify(type)
+        await user.save();
+        commonControler.successMessage(user,"data add successfully",res)
+        }catch(err){
+          commonControler.errorMessage("occured err",res)
+        }
+
+       }
+
+
+        // add arr of obj
+       async addarrofobj(req,res){
+        const{name}=req.body;
+        try{
+          var array = [
+            { name:"string 1", value:"this", other: "that" },
+            { name:"string 2", value:"this", other: "that" }
+        ];
+        console.log(typeof array);
+      const user = await User.create({
+       name:JSON.stringify(array)
+      })
+        commonControler.successMessage(user,"data add ",res)
+        }catch(err){
+          commonControler.errorMessage("occured err",res)
+        }
+       }
 
 
 
+       // update array of object
+       async updatearrobj(req,res){
+        const {_id,name,newlink,other,value}=req.body;
+        try{
+          const user =await User.findById({
+            _id
+          })
+          const x=JSON.parse(user.name)
+          for (let i = 0; i < x.length; i++) {
+            console.log(x[i], "????");
+            if(x[i].name === name){
+              console.log("yes");
+              x[i].name = newlink
+              console.log("no")
+              break;
+             }else if(x[i].other === other){
+              x[i].other = newlink
+              break;
+             }else if(x[i].value === value){
+              x[i].value = newlink
+              break;
+             }
+          
+          }
+          console.log(x,"xdata");
+          user.name =JSON.stringify(x)
+          await user.save();
+          commonControler.successMessage(user,"data updated ",res)
+        }catch(err){
+          commonControler.errorMessage("occured err",res)
+        }
+       }
+       
+       
+       // push data array of
+      // push data to array of object
+      async pushdataarrofobj(req, res) {
+        const { _id, name,other } = req.body;
+        try {
+          const sun = await User.findById(_id);
+          if (!sun) {
+            return commonControler.errorMessage("user not found", res);
+          }
+          const bb =JSON.parse(sun.name)
+          for (let i = 0; i < bb.length; i++) {
+            console.log([i],"dd");
+          }
+          bb.push({name,other})
+          console.log(bb,"data");
+             // Reassign the modified array back to sun.name
+        sun.name = JSON.stringify(bb);
+
+        // Save the updated document
+        await sun.save();
+
+          return res.status(200).json({ message: "Name added successfully", user: sun });
+        } catch (err) {
+          console.log("err", err);
+          return commonControler.errorMessage("occurred error", res);
+        }
+      }
+      
+
+    }
 module.exports = UserController;

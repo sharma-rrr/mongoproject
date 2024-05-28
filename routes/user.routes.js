@@ -18,7 +18,7 @@ router.post('/updateshild', controllerInstance.updateshiled);
 // adddaily reward
 router.post('/addrewrd', controllerInstance.addDailyReward);
 // add userbike outfit
-router.post('/adduserOutFit', controllerInstance.addOutfit);
+router.post('/userOutFit', controllerInstance.addOutfit);
 // unique id convert into email
 router.post('/change', controllerInstance.changemail);
 // get data by objectid
@@ -34,10 +34,45 @@ router.post('/lookup', controllerInstance.lookupjoin);
 
 
 // get data from users tables
+
 router.post('/aa',controllerInstance.getusers);
 
 // delete  fetch data from users table and userbike table 
-router.post('/deldata',controllerInstance.deldata);
+router.post('/deletedata',controllerInstance.deldata);
+
+ 
+// array of string
+router.post('/arrstring',controllerInstance.arrstring);
+
+// update arrstring
+router.post('/updatestr',controllerInstance.updatestr);
+
+// update artray of string data
+router.post('/updatearrayofstring',controllerInstance.updatearrayofstring);
+
+// push arraystring daTa
+router.post('/pushdatastr',controllerInstance.pushdatastr);
+ 
+
+
+// add array of number
+router.post('/arrofnum ',controllerInstance.arrayofnumber);
+// update array of number
+router.post('/updatearrnum',controllerInstance.updatearrnum);
+// push data in array of number
+router.post('/pushdata',controllerInstance.pushdata);
+// array of object 
+router.post('/arrofobj',controllerInstance.addarrofobj);
+// update arr of object
+router.post('/updatearrobj',controllerInstance.updatearrobj);
+
+// 
+router.post('/pushdataaa',controllerInstance.pushdataarrofobj);
+
+
+
+
+
 
 
 

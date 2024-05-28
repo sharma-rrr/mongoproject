@@ -24,6 +24,7 @@
     "chai-http": "^4.3.0",
     "config": "^3.3.11",
     "cors": "^2.8.5",
+    "cron": "^3.1.7",
     "crypto-random-string": "^3.2.0",
     "dotenv": "^8.6.0",
     "express": "^4.17.1",
