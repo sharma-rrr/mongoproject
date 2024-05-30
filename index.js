@@ -11,6 +11,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const userroutes = require('./routes/user.routes');
+const avtarroutes =require ('./routes/avtar.routes.js')
 
 const server = express();
 
@@ -28,7 +29,7 @@ server.use(express.json());
 
 // Routes
 server.use('/api/v1/auth', userroutes);
-
+server.use('/api/v1/avtar',avtarroutes)
 // Define and start the cron job
 const cronsettime = new CronJob('0 0 * * *', () => {
   console.log('Cron job running every day at midnight');

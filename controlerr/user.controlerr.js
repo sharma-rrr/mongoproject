@@ -370,7 +370,6 @@ async getdata(req,res){
 // lookup join
 async  lookupjoin(req, res) {
   const { uniqueId } = req.body;
-
   try {
     const usersWithBikes = await User.aggregate([
       {
@@ -406,68 +405,9 @@ async  lookupjoin(req, res) {
 }
 
 
-// async  lookupjoin(req, res) {
-//   const { _id } = req.body;
-
-//   try {
-//     // Ensure the _id is in ObjectId format if it is not already
-//     const ObjectId = require('mongoose').Types.ObjectId;
-//     if (!ObjectId.isValid(_id)) {
-//       return commonControler.errorMessage("Invalid user ID format", res);
-//     }
-
-//     const usersWithBikes = await User.aggregate([
-//       {
-//         $match: { _id: ObjectId(_id) } // Match the specific user by _id
-//       },
-//       {
-//         $lookup: {
-//           from: 'userbikes',
-//           localField: '_id',
-//           foreignField: 'userId',
-//           as: 'userbikes'
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: 'parents',
-//           localField: '_id',
-//           foreignField: 'userId',
-//           as: 'parents'
-//         }
-//       }
-//     ]);
-
-//     if (usersWithBikes.length > 0) {
-//       // Parse the name field
-//       const user = usersWithBikes[0];
-//       if (user.name && user.name.length > 0) {
-//         try {
-//           user.name = user.name.map(nameStr => JSON.parse(nameStr));
-//         } catch (e) {
-//           console.error("Error parsing name field:", e);
-//           return commonControler.errorMessage("Error parsing user data", res);
-//         }
-//       }
-
-//       res.status(200).json({ message: 'Data retrieved successfully', data: user });
-//     } else {
-//       commonControler.errorMessage("User not found", res);
-//     }
-//   } catch (error) {
-//     console.error("Error occurred:", error);
-//     commonControler.errorMessage("An error occurred while retrieving data", res);
-//   }
-// }
 
 
 
-
-
-
-
-
-  // get all users
  // get all users
 async getusers(req, res) {
   try {
@@ -790,7 +730,91 @@ async updatearrnum(req, res) {
               return commonControler.errorMessage("An error occurred", res);
           }
       }
+
+
+
+
+
+
+// add image
+         async AddImage(req, res) {
+          try {
+            const { file } = req;
+            const { _id } = req.body; 
+        
+            console.log("req.......", file);
+            
+            if (!file) {
+              return commonControler.errorMessage("No file uploaded", res);
+            }
+        
+            const user = await User.findById(_id);
+            if (user) {
+              return commonControler.errorMessage("User already exists", res);
+            }
+        
+            const imagePath = file.path;
+            if (!imagePath.match(/\.(png|jpg|jpeg)$/)) {
+              return commonControler.errorMessage("Please upload a PNG or JPG image", res);
+            }
+        
+            const profileUrl = `https://api.orthomatri.com/${file.filename}`;
+            await User.create({ profile: profileUrl });
+        
+            return commonControler.successMessage(profileUrl, "Profile created successfully", res);
+          } catch (error) {
+            console.error(error);
+            return commonControler.errorMessage("Failed to upload profile", res);
+          }
+        }
+        
+
+  // updatedImage function to handle updating an existing user profile image
+  async  updatedImage(req, res) {
+    try {
+      const { _id } = req.body;
+      if (!ObjectId.isValid(_id)) {
+        return commonControler.errorMessage("Invalid ObjectId format", res);
+      }
+  
+      const { file } = req;
+  
+      console.log('Received _id:', _id);
+      console.log('Received file:', file);
+  
+      if (!file) {
+        return commonControler.errorMessage("No file uploaded", res);
+      }
+  
+      const user = await User.findById(_id);
+      if (!user) {
+        return commonControler.errorMessage("User not found", res);
+      }
+  
+      const imagePath = file.path;
+      if (!imagePath.match(/\.(png|jpg|jpeg)$/)) {
+        return commonControler.errorMessage("Please upload a PNG or JPG image", res);
+      }
+  
+      const profileUrl = `https://api.orthomatri.com/${file.filename}`;
+      user.profile = profileUrl;  // Set the new profile URL
+      await user.save();  // Save the changes
+  
+      return commonControler.successMessage(profileUrl, "Profile updated successfully", res);
+    } catch (error) {
+      console.error('Error:', error);
+      return commonControler.errorMessage("Failed to upload profile", res);
+    }
+  }
+
+          }
+      
+   
+
+
+
+         
       
 
-    }
+    
 module.exports = UserController;

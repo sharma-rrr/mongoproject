@@ -33,8 +33,12 @@ const userSchema = new Schema({
   dailyReward: {
     type: String,
     trim: false
+  },
+  profile:{
+    type: String,
+    trim: false
   }
-}, { timestamps: true });
+}, {timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 
